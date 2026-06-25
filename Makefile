@@ -1,7 +1,7 @@
 CC = gcc
 CXX = g++
 DEBUG = -g
-LIBFLAGS = -lrt 
+LIBFLAGS = -lrt
 LDFLAGS ?= -ldl -llzma -lbz2 -lm -lz
 CXXFLAGS = -Wall -O2 -fopenmp -std=c++14
 CFLAGS = -Wall -std=c99 -O2
@@ -38,7 +38,7 @@ FAST5_INCLUDE = -I./fast5/include
 #pod5
 POD5_DEPEND = pod5-file-format/build/Release/lib/libpod5_format.a
 POD5_INCLUDE = -I./pod5-file-format/build/c++
-POD5_LIB = -L${PATH_SPACEFIX}pod5-file-format/build/Release/lib -lpod5_format 
+POD5_LIB = -L${PATH_SPACEFIX}pod5-file-format/build/Release/lib -lpod5_format
 POD5_LIB += -L${PATH_SPACEFIX}pod5-file-format/build/third_party/libs -larrow -ljemalloc_pic -lzstd
 
 #add include flags for each library
@@ -61,17 +61,17 @@ hdf5-1.8.14/hdf5/lib/libhdf5.a:
 		cd hdf5-1.8.14 && \
 			./configure --enable-threadsafe && \
 			make && make install; \
-	fi 
+	fi
 
 tensorflow/include/tensorflow/c/c_api.h:
 	if [ ! -e tensorflow/include/tensorflow/c/c_api.h ]; then \
 		mkdir tensorflow; \
 		cd tensorflow; \
-		wget https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-gpu-linux-x86_64-2.4.1.tar.gz; \
-		tar -xzf libtensorflow-gpu-linux-x86_64-2.4.1.tar.gz || exit 255; \
+		wget https://storage.googleapis.com/tensorflow/versions/2.18.0/libtensorflow-gpu-linux-x86_64.tar.gz; \
+		tar -xzf libtensorflow-gpu-linux-x86_64.tar.gz || exit 255; \
 		cd ..; \
 	fi
-	
+
 pod5-file-format/build/Release/lib/libpod5_format.a:
 	if [ ! -e pod5-file-format/build/Release/lib/libpod5_format.a ]; then \
 		pip3 install "conan<2" build; \
@@ -86,18 +86,18 @@ pod5-file-format/build/Release/lib/libpod5_format.a:
 		conan install --build=missing -s build_type=Release .. && cmake -DENABLE_CONAN=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake .. && make -j; \
 		cd ../..; \
 	fi
-	
+
 SUBDIRS = src src/scrappie src/pfasta src/sgsmooth
 CPP_SRC := $(foreach dir, $(SUBDIRS), $(wildcard $(dir)/*.cpp))
 C_SRC := $(foreach dir, $(SUBDIRS), $(wildcard $(dir)/*.c))
 DNA_EXE_SRC = src/main/DNAscent.cpp
 
-#log the commit 
+#log the commit
 src/gitcommit.h: .git/HEAD .git/index
 	echo "const char *gitcommit = \"$(shell git rev-parse HEAD)\";" > $@
 
 #log the software path
-src/softwarepath.h: 
+src/softwarepath.h:
 	echo "const char *executablePath = \"${PATH_SPACEFIX}\";" > $@
 
 #generate object names
@@ -118,7 +118,7 @@ depend: .depend
 
 .c.o:
 	$(CC) -o $@ -c $(CFLAGS) $(CPPFLAGS) $(H5_INCLUDE) -fPIC $<
-	
+
 src/main/DNAscent.o: src/gitcommit.h src/softwarepath.h
 	$(CXX) -o $@ -c $(CXXFLAGS) $(CPPFLAGS) -fPIC $<
 
